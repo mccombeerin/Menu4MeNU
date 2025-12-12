@@ -1,6 +1,16 @@
+import { useState } from "react"; /* for changing what button says in certain states */
 import { Leaf } from "lucide-react";
 import { Button } from "./ui/button";
+
 const Header = () => {
+  /* to change dark mode button based on state */
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains("dark"));
+
+  const toggleDarkMode = () => {
+    document.documentElement.classList.toggle("dark");
+    setIsDark(document.documentElement.classList.contains("dark"));
+  };
+
   return <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-background/80 border-b border-border/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
@@ -26,11 +36,19 @@ const Header = () => {
             </a>
           </nav>
 
-          <Button variant="hero" size="sm">
+          <button className="px-4 py-2 rounded-full bg-accent text-foreground hover:bg-secondary/80 transition-all">
             Get Started
-          </Button>
+          </button>
+
+          <button
+            onClick={toggleDarkMode} /* use toggle function to change what button says */
+            className="px-4 py-2 rounded-full bg-muted text-foreground hover:bg-secondary/80 transition-all"
+        >
+          {isDark ? "Toggle Light Mode" : "Toggle Dark Mode"} 
+        </button>
         </div>
       </div>
     </header>;
 };
+
 export default Header;

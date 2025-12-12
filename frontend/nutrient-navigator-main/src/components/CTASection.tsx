@@ -22,10 +22,11 @@ const CTASection = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-up" style={{
           animationDelay: '0.2s'
         }}>
-            <Button variant="hero" size="xl">
+            <button className="px-6 py-3 rounded-full bg-accent text-foreground hover:bg-secondary/80 transition-all flex items-center gap-2">
               Start Your Journey
               <ArrowRight className="w-5 h-5" />
-            </Button>
+            </button>
+
             <Button variant="outline" size="lg">
               View Sample Meals
             </Button>
