@@ -122,6 +122,9 @@
 @layer base {
   * {
     box-sizing: border-box;
+
+    /* Custom cursor for the whole site */
+    cursor: url('https://cur.cursors-4u.net/food/foo-1/foo95.cur'), auto !important;
   }
 
   body {
