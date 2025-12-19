@@ -1,30 +1,42 @@
+import { useState, useCallback, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import Recipes from "./pages/Recipes";
 import NotFound from "./pages/NotFound";
+import VoiceCommands from "@/components/VoiceCommands";
 
 const queryClient = new QueryClient();
 
+const AppContent = ({ isDark, toggleDarkMode }: { isDark: boolean; toggleDarkMode: () => void }) => {
+  const location = useLocation();
+
+  // Stop speech when route changes
+  useEffect(() => {
+    window.speechSynthesis.cancel();
+  }, [location]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Index isDark={isDark} toggleDarkMode={toggleDarkMode} />} />
+      <Route path="/recipes" element={<Recipes isDark={isDark} toggleDarkMode={toggleDarkMode} />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => {
-  const readPage = () => {
-    const synth = window.speechSynthesis;
+  // Dark mode state
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains("dark"));
 
-    if (synth.speaking) {
-      synth.cancel(); // stop if already reading
-      return;
-    }
-
-
-    // Only read the main content
-    const text =
-      document.getElementById("tts-content")?.innerText || "";
-    const utterance = new SpeechSynthesisUtterance(text);
-    synth.speak(utterance);
-  };
+  // Memoized toggle function
+  const toggleDarkMode = useCallback(() => {
+    document.documentElement.classList.toggle("dark");
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -32,22 +44,9 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          {/* Global Read Page button */}
-          <button
-            onClick={readPage}
-            className="fixed bottom-6 right-6 z-50 px-4 py-2 rounded-full bg-primary text-white shadow-lg
-                      transform transition-transform duration-200 hover:scale-105"
-            aria-label="Read page aloud"
-          >
-            🔊 Read page
-          </button>
-
-
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/recipes" element={<Recipes />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          {/* VoiceCommands outside re-rendering routes */}
+          <VoiceCommands toggleDarkMode={toggleDarkMode} />
+          <AppContent isDark={isDark} toggleDarkMode={toggleDarkMode} />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
